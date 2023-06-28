@@ -2,7 +2,7 @@ import * as p from '@clack/prompts'
 import color from 'picocolors'
 import fs from 'fs'
 import { homedir } from 'os'
-import { z } from 'zod'
+import { ZodError, z } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 
 import { CONFIG_FILE_NAME } from './constants'
@@ -31,8 +31,8 @@ function validateConfig(
 ): z.infer<typeof Config> {
   try {
     return Config.parse(config)
-  } catch (err: any) {
-    exitProgram({ message: fromZodError(err).message })
+  } catch (err) {
+    exitProgram({ message: fromZodError(err as ZodError).message })
   }
 }
 
@@ -102,7 +102,7 @@ export async function inferTypeFromBranch(
   const found = types.find((t) => {
     const start_dash = new RegExp(`^${t}-`)
     const between_dash = new RegExp(`-${t}-`)
-    const before_slash = new RegExp(`${t}\/`)
+    const before_slash = new RegExp(`${t}/`)
     const re = [
       branch.match(start_dash),
       branch.match(between_dash),

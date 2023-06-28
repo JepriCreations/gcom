@@ -139,10 +139,10 @@ export const Config = z
         max_length: z.number().positive().default(70),
       })
       .default({}),
-    confirm_push: z.boolean().default(true),
-    push_changes: z
+    push: z
       .object({
         enable: z.boolean().default(true),
+        confirm: z.boolean().default(true),
       })
       .default({}),
   })

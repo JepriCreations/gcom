@@ -9,27 +9,29 @@ export const REGEX_SLASH_TAG = new RegExp(/\/(\w+-\d+)/)
 export const REGEX_START_TAG = new RegExp(/^(\w+-\d+)/)
 export const REGEX_SLASH_NUM = new RegExp(/\/(\d+)/)
 export const REGEX_START_NUM = new RegExp(/^(\d+)/)
-export const REGEX_START_UND = new RegExp(/^([A-Z]+-[\[a-zA-Z\]\d]+)_/)
-export const REGEX_SLASH_UND = new RegExp(/\/([A-Z]+-[\[a-zA-Z\]\d]+)_/)
+export const REGEX_START_UND = new RegExp(/^([A-Z]+-[[a-zA-Z\]\d]+)_/)
+export const REGEX_SLASH_UND = new RegExp(/\/([A-Z]+-[[a-zA-Z\]\d]+)_/)
+
+export const BREAKING_TYPES = ['feat', 'fix', 'hotfix']
 
 export const DEFAULT_TYPE_OPTIONS = [
   {
-    value: 'refactor',
-    label: 'refactor',
-    hint: 'A general code change that does not add a feature or fix a bug.',
-    emoji: '🔨',
-  },
-  {
     value: 'feat',
     label: 'feat',
-    hint: 'Add new feature',
-    emoji: '✨',
+    hint: 'A new feature',
+    emoji: '🆕',
   },
   {
     value: 'fix',
     label: 'fix',
-    hint: 'Fixing a bug',
+    hint: 'A bug fix',
     emoji: '🐛',
+  },
+  {
+    value: 'refactor',
+    label: 'refactor',
+    hint: 'A code change that neither fixes a bug nor adds a feature',
+    emoji: '♻️',
   },
   {
     value: 'perf',
@@ -40,32 +42,38 @@ export const DEFAULT_TYPE_OPTIONS = [
   {
     value: 'docs',
     label: 'docs',
-    hint: 'Add or update documentation',
-    emoji: '📚',
+    hint: 'Documentation only changes',
+    emoji: '📝',
   },
   {
-    value: 'format',
-    label: 'format',
-    hint: 'Updating the UI and style files.',
+    value: 'style',
+    label: 'style',
+    hint: 'Changes that do not affect the meaning of the code',
     emoji: '💅',
   },
   {
     value: 'test',
     label: 'test',
-    hint: 'Adding or updating tests',
+    hint: 'Adding missing tests or correcting existing tests',
     emoji: '✅',
   },
   {
-    value: 'translation',
-    label: 'translation',
-    hint: 'Changes in translation files',
+    value: 'int',
+    label: 'int',
+    hint: 'Changes that affect internationalization',
     emoji: '🌍',
   },
   {
     value: 'build',
     label: 'build',
     hint: 'Changes that affect the build system or external dependencies',
-    emoji: '🚧',
+    emoji: '🏗️',
+  },
+  {
+    value: 'ci',
+    label: 'ci',
+    hint: 'Changes to our CI configuration files and scripts',
+    emoji: '🔧',
   },
   {
     value: 'clean',

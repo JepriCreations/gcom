@@ -1,0 +1,37 @@
+{
+  "git": {
+    "requireBranch": "main",
+    "commitMessage": "🔖 chore: release v${version}"
+  },
+  "hooks": {
+    "before:init": ["pnpm lint"],
+    "after:bump": "pnpm build",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}.",
+    "after:publish": "echo Successfully publish v${version}."
+  },
+  "github": {
+    "release": true
+  },
+  "npm": {
+    "ignoreVersion": true
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "✨ feat",
+            "section": "Features"
+          },
+          {
+            "type": "🐛 fix",
+            "section": "Bug Fixes"
+          },
+          {}
+        ]
+      }
+    }
+  }
+}

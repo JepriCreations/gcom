@@ -1,8 +1,6 @@
-import { trytm } from '@bdsqqq/try'
 import { exec, execSync } from 'child_process'
 import { promisify } from 'util'
 import { exitProgram } from './utils'
-import { title } from 'process'
 
 const execAsync = promisify(exec)
 
@@ -25,7 +23,12 @@ export function getGitRoot() {
 
 export async function getChangedFiles() {
   const { stdout } = await execAsync('git status --porcelain')
-  return cleanStdout(stdout).map((line) => line.split(' ').pop()!)
+  const result: string[] = []
+  cleanStdout(stdout).forEach((line) => {
+    const last = line.split(' ').pop()
+    if (last) result.push(last)
+  })
+  return result
 }
 
 export async function getStagedFiles() {

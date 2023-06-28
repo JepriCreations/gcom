@@ -21,6 +21,7 @@ import {
   gitPush,
 } from './git'
 import {
+  BREAKING_TYPES,
   COMMIT_FOOTER_OPTIONS,
   CONFIG_FILE_NAME,
   CUSTOM_SCOPE_KEY,
@@ -38,10 +39,11 @@ import {
 main(loadSetup())
 
 export async function main(config: z.infer<typeof Config>) {
-  let commit_state = CommitState.parse({})
+  const commit_state = CommitState.parse({})
   const [changed_files, error_changed_files] = await trytm(getChangedFiles())
   const [staged_files, error_staged_files] = await trytm(getStagedFiles())
-  let git_status = { changed_files, staged_files }
+  const git_status = { changed_files, staged_files }
+  let breakingChange = false
 
   // STATUS CHECK
   if (config.check_status) {
@@ -125,6 +127,17 @@ export async function main(config: z.infer<typeof Config>) {
     })
 
     if (p.isCancel(commit_type)) exitProgram()
+
+    if (BREAKING_TYPES.includes(commit_type)) {
+      breakingChange = (await p.confirm({
+        initialValue: false,
+        message: color.yellow(
+          'Does this commit have changes that break previous compatibility?'
+        ),
+      })) as boolean
+
+      if (p.isCancel(breakingChange)) exitProgram()
+    }
 
     const emoji =
       config.commit_type.options.find((opt) => opt.value === commit_type)
@@ -242,17 +255,22 @@ export async function main(config: z.infer<typeof Config>) {
   }
 
   // COMMIT FOOTER
-  if (config.commit_footer.enable) {
-    const commit_footer = await p.multiselect({
-      message: `Select optional footers ${SPACE_TO_SELECT}`,
-      initialValues: config.commit_footer.initial_value,
-      options: COMMIT_FOOTER_OPTIONS as {
-        value: z.infer<typeof Z_FOOTER_OPTIONS>
-        label: string
-        hint: string
-      }[],
-      required: false,
-    })
+  if (config.commit_footer.enable || breakingChange) {
+    let commit_footer = null
+    if (breakingChange) {
+      commit_footer = Z_FOOTER_OPTIONS.Enum['breaking-change']
+    } else {
+      commit_footer = await p.multiselect({
+        message: `Select optional footers ${SPACE_TO_SELECT}`,
+        initialValues: config.commit_footer.initial_value,
+        options: COMMIT_FOOTER_OPTIONS as {
+          value: z.infer<typeof Z_FOOTER_OPTIONS>
+          label: string
+          hint: string
+        }[],
+        required: false,
+      })
+    }
     if (p.isCancel(commit_footer)) exitProgram()
 
     if (commit_footer.includes('breaking-change')) {
@@ -330,7 +348,7 @@ export async function main(config: z.infer<typeof Config>) {
     process.exit(0)
   }
 
-  let commit = buildCommitString({ commit_state, config, colorize: false })
+  const commit = buildCommitString({ commit_state, config, colorize: false })
     .toString()
     .trim()
   const [output, output_error] = await trytm(gitCommit({ commit }))
@@ -350,10 +368,10 @@ export async function main(config: z.infer<typeof Config>) {
   }
 
   // PUSH CHANGES
-  if (config.push_changes.enable) {
+  if (config.push.enable && !breakingChange) {
     let continue_push = true
 
-    if (config.confirm_push) {
+    if (config.push.confirm) {
       continue_push = (await p.confirm({
         initialValue: true,
         message: 'Do you want to push your changes now?',
@@ -368,11 +386,11 @@ export async function main(config: z.infer<typeof Config>) {
     const [branch] = await trytm(getCurrentBranchName())
     const s = p.spinner()
     s.start(`Pushing your changes to ${branch}`)
-    const [push, push_error] = await trytm(gitPush())
+    const [, push_error] = await trytm(gitPush())
     if (push_error) {
       p.log.error('Something went wrong when pushing: ' + push_error.message)
+      exitProgram()
     }
-    s.stop('✅')
-    p.log.success('The changes has been pushed with success 🎉')
+    s.stop('✅ pushed with success')
   }
 }
