@@ -4,15 +4,15 @@
     "commitMessage": "🔖 chore: release v${version}"
   },
   "hooks": {
-    "before:init": ["pnpm lint"],
+    "before:init": ["git pull", "pnpm lint"],
     "after:bump": "pnpm build",
-    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}.",
-    "after:publish": "echo Successfully publish v${version}."
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },
   "github": {
     "release": true
   },
   "npm": {
+    "versionArgs": ["--allow-same-version", "--workspaces-update=false"],
     "ignoreVersion": true
   },
   "plugins": {
@@ -22,7 +22,7 @@
         "name": "conventionalcommits",
         "types": [
           {
-            "type": "✨ feat",
+            "type": "🆕 feat",
             "section": "Features"
           },
           {

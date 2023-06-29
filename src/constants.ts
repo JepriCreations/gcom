@@ -31,7 +31,7 @@ export const DEFAULT_TYPE_OPTIONS = [
     value: 'refactor',
     label: 'refactor',
     hint: 'A code change that neither fixes a bug nor adds a feature',
-    emoji: '♻️',
+    emoji: '🔨',
   },
   {
     value: 'perf',
@@ -49,7 +49,7 @@ export const DEFAULT_TYPE_OPTIONS = [
     value: 'style',
     label: 'style',
     hint: 'Changes that do not affect the meaning of the code',
-    emoji: '💅',
+    emoji: '💎',
   },
   {
     value: 'test',
@@ -67,7 +67,7 @@ export const DEFAULT_TYPE_OPTIONS = [
     value: 'build',
     label: 'build',
     hint: 'Changes that affect the build system or external dependencies',
-    emoji: '🏗️',
+    emoji: '📦',
   },
   {
     value: 'ci',

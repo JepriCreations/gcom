@@ -23,7 +23,7 @@
         "value": "refactor",
         "label": "refactor",
         "hint": "A code change that neither fixes a bug nor adds a feature",
-        "emoji": "♻️"
+        "emoji": "🔨"
       },
       {
         "value": "perf",
@@ -41,7 +41,7 @@
         "value": "style",
         "label": "style",
         "hint": "Changes that do not affect the meaning of the code",
-        "emoji": "💅"
+        "emoji": "💎"
       },
       {
         "value": "test",
@@ -59,7 +59,7 @@
         "value": "build",
         "label": "build",
         "hint": "Changes that affect the build system or external dependencies",
-        "emoji": "🏗️"
+        "emoji": "📦"
       },
       {
         "value": "ci",
