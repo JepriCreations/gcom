@@ -21,8 +21,8 @@
       "infile": "CHANGELOG.md",
       "preset": "angular",
       "parserOpts": {
-        "headerPattern": "/^(S*) (w*)(?:(([w$.-* ]*)))?: (.*)$/",
-        "headerCorrespondence": "['emoji', 'type', 'scope', 'subject']"
+        "headerPattern": "/^(\\S*) (\\w*)(?:\\(([^)]*)\\))?: (.*)$/",
+        "headerCorrespondence": ["emoji", "type", "scope", "subject"]
       }
     }
   }
