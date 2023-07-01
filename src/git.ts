@@ -8,8 +8,14 @@ function cleanStdout(stdout: string) {
   return stdout.trim().split('\n').filter(Boolean)
 }
 
+function isWindows(): boolean {
+  return process.platform === 'win32'
+}
+
 export function getGitRoot() {
-  const command = 'git rev-parse --show-toplevel 2>NUL'
+  const command = isWindows()
+    ? 'git rev-parse --show-toplevel 2>NUL'
+    : 'git rev-parse --show-toplevel'
   try {
     const dir = execSync(command).toString().trim()
     return dir
