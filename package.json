@@ -15,7 +15,8 @@
     "build": "tsup ./src/",
     "commit": "jiti ./src/bin.ts",
     "lint": "eslint ./src",
-    "release": "dotenv release-it --"
+    "release": "dotenv release-it --",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Jepri Creations",
