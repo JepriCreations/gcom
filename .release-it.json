@@ -4,9 +4,10 @@
     "commitMessage": "🔖 chore: release v${version}"
   },
   "hooks": {
-    "before:init": ["git pull", "pnpm lint"],
+    "before:init": ["npm test", "git pull", "pnpm lint"],
     "after:bump": "pnpm build",
-    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+    "after:npm:release": "echo Successfully published ${name} v${version} to npm. 📦",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}. 🚀"
   },
   "github": {
     "release": true
@@ -18,19 +19,10 @@
   "plugins": {
     "@release-it/conventional-changelog": {
       "infile": "CHANGELOG.md",
-      "preset": {
-        "name": "conventionalcommits",
-        "types": [
-          {
-            "type": "🆕 feat",
-            "section": "Features"
-          },
-          {
-            "type": "🐛 fix",
-            "section": "Bug Fixes"
-          },
-          {}
-        ]
+      "preset": "angular",
+      "parserOpts": {
+        "headerPattern": "/^(S*) (w*)(?:(([w$.-* ]*)))?: (.*)$/",
+        "headerCorrespondence": "['emoji', 'type', 'scope', 'subject']"
       }
     }
   }
