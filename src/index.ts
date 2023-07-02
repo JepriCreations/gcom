@@ -36,9 +36,11 @@ import {
   Z_FOOTER_OPTIONS,
 } from './constants'
 
-main(loadSetup())
+main()
 
-export async function main(config: z.infer<typeof Config>) {
+export async function main() {
+  const config: z.infer<typeof Config> = await loadSetup()
+
   const commit_state = CommitState.parse({})
   const [changed_files, error_changed_files] = await trytm(getChangedFiles())
   const [staged_files, error_staged_files] = await trytm(getStagedFiles())
@@ -69,23 +71,33 @@ export async function main(config: z.infer<typeof Config>) {
       changed_files.some((file) => !staged_files.includes(file))
 
     if (missing_staged) {
+      const addAll = {
+        value: 'all',
+        label: 'Add all',
+      }
+
       const unstaged_files = changed_files.filter(
         (f) => !staged_files.includes(f)
       )
 
+      const options = unstaged_files.map((file) => ({
+        value: file,
+        label: file,
+      }))
+      options.unshift(addAll)
+
       const files = (await p.multiselect({
         message: `There are files that have not been staged. Select the ones you want to add. ${SPACE_TO_SELECT}`,
-        options: unstaged_files.map((file) => ({
-          value: file,
-          label: file,
-        })),
+        options,
         required: staged_files.length === 0,
       })) as string[]
 
       if (p.isCancel(files)) exitProgram()
 
-      await gitAdd({ files })
-      git_status.staged_files = staged_files.concat(files)
+      const filesToAdd = files.includes(addAll.value) ? unstaged_files : files
+
+      await gitAdd({ files: filesToAdd })
+      git_status.staged_files = staged_files.concat(filesToAdd)
     }
   }
 
@@ -104,6 +116,7 @@ export async function main(config: z.infer<typeof Config>) {
 
   // COMMIT TYPE
   if (config.commit_type.enable) {
+    p.log.step(color.black(color.bgGreen(' Preparing Commit ')))
     let initial_value = config.commit_type.initial_value
 
     if (config.commit_type.infer_type_from_branch) {
@@ -369,6 +382,7 @@ export async function main(config: z.infer<typeof Config>) {
 
   // PUSH CHANGES
   if (config.push.enable && !breakingChange) {
+    p.log.step(color.black(color.bgGreen(' Ready to push ')))
     let continue_push = true
 
     if (config.push.confirm) {
@@ -391,6 +405,6 @@ export async function main(config: z.infer<typeof Config>) {
       p.log.error('Something went wrong when pushing: ' + push_error.message)
       exitProgram()
     }
-    s.stop('✅ pushed with success')
+    s.stop(color.green('The changes has been pushed 🥳'))
   }
 }

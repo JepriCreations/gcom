@@ -5,7 +5,7 @@ import { homedir } from 'os'
 import { ZodError, z } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 
-import { CONFIG_FILE_NAME } from './constants'
+import { CONFIG_FILE_NAME, DEFAULT_TYPE_OPTIONS } from './constants'
 import { getCurrentBranchName, getGitRoot } from './git'
 import { CommitState, Config } from './validations'
 import { trytm } from '@bdsqqq/try'
@@ -47,10 +47,14 @@ function readConfigFromPath(config_path: string) {
   return validateConfig(res)
 }
 
-/**
- * Star INTRO
- */
-export function loadSetup(): z.infer<typeof Config> {
+function getTypeData(value?: string) {
+  return (
+    DEFAULT_TYPE_OPTIONS.find((type) => type.value === value) ??
+    DEFAULT_TYPE_OPTIONS[0]
+  )
+}
+
+export async function loadSetup(): Promise<z.infer<typeof Config>> {
   let config: { value: z.infer<typeof Config>; message: string }
   // Welcome the user to the CLI
   p.intro(
@@ -70,13 +74,33 @@ export function loadSetup(): z.infer<typeof Config> {
     }
 
     // If there is no default config yet, create one
-    // TODO: Ask user for basic config
   } else {
-    const default_config = Config.parse({})
-    fs.writeFileSync(root_path, JSON.stringify(default_config, null, 2))
-    config = {
-      value: default_config,
-      message: `Config not found. A default ${CONFIG_FILE_NAME} has been generated for you.`,
+    const configType = (await p.select({
+      message:
+        'Config not found. Do you want to use the default, or create a custom one?',
+      options: [
+        { value: 'default', label: 'Default' },
+        { value: 'custom', label: 'Custom' },
+      ],
+    })) as 'default' | 'custom'
+    if (p.isCancel(configType)) exitProgram()
+
+    if (configType === 'default') {
+      const default_config = Config.parse({})
+
+      fs.writeFileSync(root_path, JSON.stringify(default_config, null, 2))
+      config = {
+        value: default_config,
+        message: `A default ${CONFIG_FILE_NAME} has been generated for you.`,
+      }
+    } else {
+      const default_config = await configGuide()
+
+      fs.writeFileSync(root_path, JSON.stringify(default_config, null, 2))
+      config = {
+        value: default_config,
+        message: `Your ${CONFIG_FILE_NAME} has been generated.`,
+      }
     }
   }
 
@@ -84,13 +108,10 @@ export function loadSetup(): z.infer<typeof Config> {
     console.clear()
   }
 
-  p.log.step(config.message)
+  p.log.success(config.message)
 
   return config.value
 }
-/**
- * End INTRO
- */
 
 export async function inferTypeFromBranch(
   types: string[] = []
@@ -112,6 +133,125 @@ export async function inferTypeFromBranch(
   })
 
   return found ?? ''
+}
+
+async function configGuide() {
+  const group = await p.group(
+    {
+      clean_console: () =>
+        p.confirm({
+          message: 'Clean the console every time the command is run?',
+          initialValue: false,
+        }),
+      commit_initial_value: () =>
+        p.select({
+          message: 'Select a default commit type value',
+          initialValue: DEFAULT_TYPE_OPTIONS[2].value,
+          options: DEFAULT_TYPE_OPTIONS.map(({ value, label, hint }) => ({
+            value,
+            label,
+            hint,
+          })),
+        }),
+      emojis: ({ results }) => {
+        const initial_value = results.commit_initial_value
+        return p.confirm({
+          message: `Use emojis in commits? ${color.dim(
+            `Ex.: ${
+              getTypeData(initial_value)?.emoji
+            } ${initial_value}: Example commit.`
+          )}`,
+          initialValue: true,
+        })
+      },
+      commit_scope: () =>
+        p.confirm({
+          message: 'Enable scope?',
+          initialValue: false,
+        }),
+      check_ticket: () =>
+        p.confirm({
+          message: 'Enable ticket?',
+          initialValue: false,
+        }),
+      commit_body: () =>
+        p.confirm({
+          message: 'Enable commit body?',
+          initialValue: true,
+        }),
+      commit_footer: () =>
+        p.confirm({
+          message: `Enable commit footer? ${color.dim(
+            '(It will always be activated on breaking changes)'
+          )}`,
+          initialValue: false,
+        }),
+      breaking_change_exclamation: () =>
+        p.confirm({
+          message:
+            'Add an exclamation in breaking changes to the commit title?',
+          initialValue: true,
+        }),
+      confirm_commit: () =>
+        p.confirm({
+          message: 'Do you want to be asked to confirm the commit?',
+          initialValue: true,
+        }),
+      print_commit_output: ({ results }) => {
+        const preview = results.confirm_commit
+
+        if (preview)
+          return p.confirm({
+            message: 'Do you want to preview the commit?',
+            initialValue: true,
+          })
+      },
+      push: () => {
+        return p.confirm({
+          message: `Push your changes after commit? ${color.dim(
+            '(You will be asked before push)'
+          )}`,
+          initialValue: true,
+        })
+      },
+    },
+    {
+      onCancel: () => {
+        p.cancel('Operation cancelled.')
+        process.exit(0)
+      },
+    }
+  )
+
+  const config: z.infer<typeof Config> = Config.parse({
+    clean_console: group.clean_console,
+    commit_type: {
+      initial_value: group.commit_initial_value,
+      emojis: group.emojis,
+    },
+    commit_scope: {
+      enabled: group.commit_scope,
+    },
+    check_ticket: {
+      infer_ticket: group.check_ticket,
+    },
+    commit_body: {
+      enable: group.commit_body,
+    },
+    commit_footer: {
+      enable: group.commit_footer,
+    },
+    breaking_change: {
+      add_exclamation_to_title: group.breaking_change_exclamation,
+    },
+    confirm_commit: group.confirm_commit,
+    print_commit_output: group.print_commit_output,
+    push: {
+      enable: group.push,
+    },
+  })
+
+  return config
 }
 
 export function cleanCommitTitle(title: string) {
