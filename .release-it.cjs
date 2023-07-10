@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   git: {
     requireBranch: 'main',
     commitMessage: '🔖 chore: release v${version}',
