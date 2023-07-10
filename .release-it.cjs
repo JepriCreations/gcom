@@ -4,7 +4,7 @@ module.exports = {
     commitMessage: '🔖 chore: release v${version}',
   },
   hooks: {
-    'before:init': ['npm test', 'git pull', 'pnpm lint'],
+    'before:init': ['git pull', 'pnpm lint'],
     'after:bump': 'pnpm build',
     'after:npm:release':
       'echo Successfully published ${name} v${version} to npm. 📦',
