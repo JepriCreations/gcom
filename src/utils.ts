@@ -18,6 +18,15 @@ export function addNewLine(arr: string[], i: number) {
   return i === arr.length - 1 ? '' : '\n'
 }
 
+export function readVersion() {
+  const root = getGitRoot()
+  const root_path = `${root}/package.json`
+
+  const packageJson = JSON.parse(fs.readFileSync(root_path, 'utf8'))
+  const version = packageJson?.version ?? ''
+  return version
+}
+
 export function exitProgram({
   code = 0,
   message = 'The commit has not been created',
@@ -58,7 +67,7 @@ export async function loadSetup(): Promise<z.infer<typeof Config>> {
   let config: { value: z.infer<typeof Config>; message: string }
   // Welcome the user to the CLI
   p.intro(
-    `${color.bgCyan(`${color.black(' gcom ')}`)} ${color.cyan(
+    `${color.bgCyan(`${color.black(` gcom v${readVersion()}`)}`)} ${color.cyan(
       "- Let's commit some changes to your cool project."
     )}`
   )

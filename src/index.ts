@@ -405,6 +405,7 @@ export async function main() {
       p.log.error('Something went wrong when pushing: ' + push_error.message)
       exitProgram()
     }
-    s.stop(color.green('The changes has been pushed 🥳'))
+    s.stop(color.green('The changes has been pushed.'))
+    p.outro('Done! 🥳')
   }
 }
