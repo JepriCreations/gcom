@@ -19,7 +19,7 @@ module.exports = {
     ignoreVersion: true,
   },
   plugins: {
-    './scripts/index.js': {
+    './scripts/conventional-changelog.js': {
       infile: 'CHANGELOG.md',
       preset: 'angular',
       parserOpts: {
