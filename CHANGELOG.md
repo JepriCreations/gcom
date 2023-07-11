@@ -1,5 +1,13 @@
 
 
+## [0.1.2](https://github.com/JepriCreations/gcom/compare/0.1.1...0.1.2) (2023-07-11)
+
+
+### Bug Fixes
+
+* back to release default plugin ([b69fdb8](https://github.com/JepriCreations/gcom/commit/b69fdb88c02059b0e7802e86e55a19a17a91d2e3))
+* change release-it to json to solve release ([0a83ffa](https://github.com/JepriCreations/gcom/commit/0a83ffa752f7f7a8fe45eb77494d29eecfcb95a7))
+
 ## [0.1.1](https://github.com/JepriCreations/gcom/compare/0.1.0...0.1.1) (2023-07-11)
 
 
