@@ -1,5 +1,13 @@
 
 
+## [0.1.1](https://github.com/JepriCreations/gcom/compare/0.1.0...0.1.1) (2023-07-11)
+
+
+### Bug Fixes
+
+* removing extension from bin import ([2e24b85](https://github.com/JepriCreations/gcom/commit/2e24b8510bba5269d5e523ddaa276b617cb32c21))
+* Removing type module from package.json ([4505859](https://github.com/JepriCreations/gcom/commit/45058590f08a63845b59c41a5ade619f02d64952))
+
 # [0.1.0](https://github.com/JepriCreations/gcom/compare/0.0.2...0.1.0) (2023-07-10)
 
 
