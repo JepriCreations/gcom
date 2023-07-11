@@ -17,7 +17,7 @@
     "ignoreVersion": true
   },
   "plugins": {
-    "./scripts/conventional-changelog.js": {
+    "@release-it/conventional-changelog": {
       "infile": "CHANGELOG.md",
       "preset": "angular",
       "parserOpts": {
