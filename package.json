@@ -3,7 +3,6 @@
   "private": false,
   "version": "0.1.1",
   "description": "A CLI to assits you in the commits creations.",
-  "type": "module",
   "main": "dist/index.js",
   "publishConfig": {
     "access": "public"
